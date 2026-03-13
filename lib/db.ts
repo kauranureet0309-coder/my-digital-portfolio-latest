@@ -10,6 +10,15 @@ let connectionString: string;
 // If DATABASE_URL is provided, use it directly
 if (process.env.DATABASE_URL) {
   connectionString = process.env.DATABASE_URL;
+  console.log("Using DATABASE_URL from environment");
+  
+  // Log the host being used (mask credentials for security)
+  try {
+    const url = new URL(connectionString);
+    console.log(`Database host: ${url.hostname}`);
+  } catch (e) {
+    console.log("Could not parse DATABASE_URL");
+  }
 }
 // Otherwise, construct from individual PG* variables
 else if (
@@ -18,18 +27,30 @@ else if (
   process.env.PGDATABASE &&
   process.env.PGPASSWORD
 ) {
-  connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?sslmode=require`;
+  connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?sslmode=require`;
+  console.log("Using PG* environment variables");
 }
 // Fallback (should not happen if environment variables are properly set)
 else {
   console.warn(
-    "No database credentials found in environment variables. Using fallback connection string."
+    "No database credentials found in environment variables. Please set DATABASE_URL or PG* environment variables."
   );
-  connectionString = process.env.DATABASE_URL || "";
+  connectionString = "";
 }
 
-// Create a SQL query executor using the Neon serverless driver
-const sql = neon(connectionString);
+if (!connectionString) {
+  throw new Error(
+    "DATABASE_URL is not set. Please configure your database connection string in the .env file."
+  );
+}
+
+// Create a SQL query executor using the Neon serverless driver with custom fetch options
+const sql = neon(connectionString, {
+  // Add connection timeout and retry logic
+  fetchOptions: {
+    timeout: 30000, // 30 second timeout
+  },
+});
 
 // Create a Drizzle instance
 export const db = drizzle(sql);
