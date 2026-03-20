@@ -12,8 +12,15 @@ import { Database } from "lucide-react";
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  // Check if current user is admin
-  const userIsAdmin = await isAdmin();
+  // Check if current user is admin with error handling for build time
+  let userIsAdmin = false;
+  try {
+    userIsAdmin = await isAdmin();
+  } catch (error) {
+    // Handle errors during build time when there's no authenticated user
+    console.error("Error checking admin status during page render:", error);
+    userIsAdmin = false;
+  }
   
   if (!userIsAdmin) {
     return (
