@@ -2,6 +2,8 @@ import { checkDatabaseStatus } from "@/app/actions/database";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+// Force dynamic rendering since this page tests database connectivity
+export const dynamic = 'force-dynamic';
 
 export default async function DbTestPage() {
   const result = await checkDatabaseStatus();

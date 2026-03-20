@@ -8,6 +8,9 @@ import { db, blogPosts } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
+// Allow dynamic rendering on server; home page can handle db errors gracefully
+export const revalidate = 0;
+
 export default async function Home() {
   // Fetch the latest 3 blog posts with error handling
   let latestPosts: { id: string; slug: string; title: string; excerpt: string; coverImage?: string; createdAt: string }[] = []

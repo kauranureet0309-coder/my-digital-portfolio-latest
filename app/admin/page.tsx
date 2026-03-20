@@ -8,6 +8,9 @@ import { UserRoleManagement } from "@/components/user-role-management";
 import Link from "next/link";
 import { Database } from "lucide-react";
 
+// Force dynamic rendering because this page requires Clerk authentication
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
   // Check if current user is admin
   const userIsAdmin = await isAdmin();
